@@ -12,6 +12,13 @@ be created locally).
 Created by the University of Washington Information School; see LICENSE file.
 
 
+Install
+==========================
+Move folder to DRUPAL_ROOT/sites/all/modules and rename to "uwgroups".  Enable
+the module in Drupal.  NOTE: LTS and the UW Groups LTS plugin will have to
+be setup before this module will work.
+
+
 Support
 ==========================
 If you find bugs or have suggestions for improving this project, please open
