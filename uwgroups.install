@@ -1,0 +1,72 @@
+<?php
+
+/***************************************************************
+ * UW Groups Module                                            *
+ *                                                             *
+ * Created by the University of Washington Information School. *
+ * Be sure to read README and LICENSE.                         *
+ ***************************************************************/
+
+/**
+ * @file
+ * uwgroups module installation and upgrade code.
+ */
+
+module_load_include('inc', 'uwgroups', 'uwgroups');
+
+//////////////////////////////////////////////////////////////////////////////
+// Core API hooks
+
+/**
+ * Implementation of hook_install().
+ */
+function uwgroups_install() {
+  drupal_install_schema('uwgroups');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function uwgroups_uninstall() {
+  // remove all our data
+  _uwgroups_remove_managed();
+  
+  // remove tables.
+  drupal_uninstall_schema('uwgroups');
+
+  // remove variables
+  variable_del(UWGWS_ENABLE_AC);
+  variable_dev(UWGWS_AC_GROUP);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Schema API hooks
+
+/**
+ * Implementation of hook_schema().
+ */
+function uwgroups_schema() {
+  $schema['uwgroups'] = array(
+  	'description' => t('The base table for the "uwgroups" module; stores managed groups.'),
+    'fields' => array(
+      'gid' => array(
+      	'description' => t('The primary identifier for a group.'),
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'name' => array(
+      	'description' => t('The name of a group.'),
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('gid'),
+    'unique keys' => array('name' => array('name')),
+  );
+  return $schema;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Upgrades
