@@ -20,8 +20,11 @@ module_load_include('inc', 'uwgroups', 'uwgroups.admin');
 /**
  * Implements hook_perm().
  */
-function uwgroups_perm() {
-  return array(UWGWS_PERM);
+function uwgroups_permission() {
+  return array(UWGWS_PERM => array(
+  	'title' => 'Administer GWS',
+  	'description' => 'Adjust GWS active groups'
+  ));
 }
 
 /**
@@ -30,7 +33,7 @@ function uwgroups_perm() {
 function uwgroups_menu() {
   $items = array();
   
-  $items['admin/settings/uwgws'] = array(
+  $items['admin/config/people/uwgws'] = array(
     'title' => t('UW GWS Auth'),
     'description' => t('Configure UW GWS Auth settings.'),
     'page callback' => '_uwgroups_admin_page',
@@ -52,31 +55,7 @@ function uwgroups_cron() {
 /**
  * Implements hook_user().
  */
-function uwgroups_user($op, &$edit, &$account, $category = NULL) {
-  switch ($op) {
-    case 'login': // update the user's groups on login
-      _uwgroups_map_groups($account);
-      break;
-  }
+function uwgroups_user_login(&$edit, $account) {
+  _uwgroups_map_groups($account);
 }
 
-/**
- * Implements hook_uwpubcookie_allow_user().
- */
-function uwgroups_uwpubcookie_allow_user($username) {
-  if (_uwgroups_var(UWGWS_ENABLE_AC)) {
-    $groups = lts_command('groups ' . $username);
-    
-    if (!$groups || empty($groups)) {
-      watchdog('UWGWS', 'Denied creation of user "%user" (could not get groups).', array('%user' => $username,), WATCHDOG_INFO);
-      return FALSE;
-    }
-    
-    if (!in_array(_uwgroups_var(UWGWS_AC_GROUP), $groups)) {
-      watchdog('UWGWS', 'Denied creation of user "%user" (user not in AC group).', array('%user' => $username,), WATCHDOG_INFO);
-      return FALSE;
-    }
-  }
-  
-  return TRUE;
-}

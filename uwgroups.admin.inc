@@ -29,41 +29,25 @@ function _uwgroups_admin_form($form_state) {
     '#value' => '<p>' . t('NOTE: LTS caches responses from the UW GWS. If certain groups are not getting pulled try clearing the LTS cache.') . '</p>',
   );
   
-  $form['grouping']['uwpubcookie'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Access Control'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-    '#tree' => TRUE
+  $form['grouping']['groups'] = array(
+  	'#type' => 'fieldset',
+  	'#title' => t('Groups'),
+  	'#collapsible' => false,
+  	'#tree' => true
   );
   
-  if (module_exists('uwpubcookie')) {
-    $form['grouping']['uwpubcookie']['enable_ac'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Enable AC'),
-      '#default_value' => _uwgroups_var(UWGWS_ENABLE_AC),
-      '#description' => t('Enable UW Pubcookie access control.'),
-    );
-    
-    $form['grouping']['uwpubcookie']['group'] = array(
-      '#type' => 'textfield',
-      '#title' => t('AC Group'),
-      '#default_value' => _uwgroups_var(UWGWS_AC_GROUP),
-      '#description' => t('The group a user must belong to in order to be allowed to log in to the site.'),
-      '#size' => 30,
-      '#maxlength' => 50,
-    );
-    
-    $form['grouping']['uwpubcookie']['save'] = array(
-      '#type' => 'submit',
-      '#value' => t('Save Configuration'),
-    );
-  }
-  else {
-    $form['grouping']['uwpubcookie']['info'] = array(
-      '#value' => '<p>' . t('You must enable the UW Pubcookie module for extra configuration settings.') . '</p>',
-    );
-  }
+  $form['grouping']['groups']['active_groups'] = array(
+  	'#type' => 'textarea',
+  	'#title' => 'Active Groups',
+  	'#default_value' => _uwgroups_var(UWGWS_ACTIVE_GROUPS),
+  	'#description' => t('List one group per line (note: removing items from this list is the same as deleting the role.)')
+  );
+  
+  $form['grouping']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save Configuration'),
+  );
+  
   
   $form['grouping']['sep'] = array( '#value' => '<br/>', );
   
@@ -76,7 +60,6 @@ function _uwgroups_admin_form($form_state) {
     '#type' => 'submit',
     '#value' => t('Remap All Users'),
   );
-  
   return $form;
 }
 
@@ -103,8 +86,7 @@ function _uwgroups_admin_form_submit($form, &$form_state) {
     drupal_set_message(t('User memberships have been re-mapped.'));
   }
   else if ($op == t('Save Configuration')) {
-    _uwgroups_var(UWGWS_ENABLE_AC, $form_state['values']['grouping']['uwpubcookie']['enable_ac']);
-    _uwgroups_var(UWGWS_ENABLE_AC, $form_state['values']['grouping']['uwpubcookie']['group']);
+    _uwgroups_var(UWGWS_ACTIVE_GROUPS, $form_state['values']['grouping']['groups']['active_groups']);
     drupal_set_message(t('Configuration saved.'));
   }
 }
@@ -115,3 +97,4 @@ function _uwgroups_admin_form_submit($form, &$form_state) {
 function _uwgroups_admin_page() {
   return drupal_get_form('_uwgroups_admin_form');
 }
+
