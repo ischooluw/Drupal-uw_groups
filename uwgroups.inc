@@ -143,7 +143,7 @@ function _uwgroups_refresh_managed() {
 
 	// -- insert new groups --
 	foreach ($groups as $group) {
-		if (isset($active_groups[$group]) && db_query("SELECT COUNT(*) FROM {uwgroups} WHERE name = :name", array(':name' => $group))->fetchObject()->{'count(*)'} == 0) {
+		if (isset($active_groups[$group]) && db_query("SELECT COUNT(*) FROM {uwgroups} WHERE name = :name", array(':name' => $group))->fetchObject()->{'COUNT(*)'} == 0) {
 			$query = null;
 			$query = db_insert('uwgroups')->fields(array('name'));
 			$query->values(array('name' => $group));
@@ -154,7 +154,7 @@ function _uwgroups_refresh_managed() {
 			}
 		}
 		
-		if (isset($active_groups[$group]) && db_query("SELECT COUNT(*) FROM {role} WHERE name = :name", array(':name' => $group))->fetchObject()->{'count(*)'} == 0) {		
+		if (isset($active_groups[$group]) && db_query("SELECT COUNT(*) FROM {role} WHERE name = :name", array(':name' => $group))->fetchObject()->{'COUNT(*)'} == 0) {		
 			$role = new stdClass();
 			$role->name = $group;
 			if(!user_role_save($role)) {
