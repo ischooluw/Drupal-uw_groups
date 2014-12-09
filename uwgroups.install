@@ -36,7 +36,7 @@ function uwgroups_uninstall() {
 
   // remove variables
   variable_del(UWGWS_ENABLE_AC);
-  variable_dev(UWGWS_AC_GROUP);
+  variable_del(UWGWS_AC_GROUP);
 }
 
 //////////////////////////////////////////////////////////////////////////////
