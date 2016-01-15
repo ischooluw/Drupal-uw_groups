@@ -40,12 +40,16 @@ function uw_groups_user_login($account){
 
 	// Get all active groups
 	$active_groups = explode("\n", \Drupal::config('uw_groups.settings')->get('active_groups'));
+	foreach($active_groups as $key => $active_group){
+		$active_groups[$key] = trim($active_group);
+	}
 
 	// Get all Roles
 	$roleObjects = Role::loadMultiple();
-
+	
 	// Sync user groups with Drupal Role Mappings
 	foreach($groups as $group){
+
 		// If it's not an active group, skip it
 		if(!in_array(trim($group), $active_groups)){
 			continue;
@@ -62,7 +66,7 @@ function uw_groups_user_login($account){
 		// If the role exists, give it to the user
 		foreach($roleObjects as $roleObject){
 			// Assign the role to the user if the role exists
-			if($roleObject->id() == $group){
+			if($roleObject->id() == trim($group)){
 				$currentUser->addRole($roleObject->id());
 			}
 		}
@@ -70,8 +74,10 @@ function uw_groups_user_login($account){
 	}
 	
 	foreach($delete_roles as $role){
+		//Pre($role);
 		// If this role is an active group, then delete it
 		if(in_array($role, $active_groups)){
+			echo 'remove:'.$role;
 			$currentUser->removeRole($role);
 		}
 	}

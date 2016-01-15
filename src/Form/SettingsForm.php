@@ -104,9 +104,9 @@ class SettingsForm extends ConfigFormBase {
 		}
     }
     
-    foreach($old_groups as $group){
+    foreach($old_groups as $old_group){
 	    foreach($roleObjects as $name => $roleObject){
-		    if(trim($name) == trim($group)){
+		    if(trim($name) == trim($old_group)){
 			    $roleObject->delete();
 		    }
 	    }
