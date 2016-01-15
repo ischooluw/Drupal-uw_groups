@@ -6,6 +6,8 @@
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\user\Entity\Role;
+use Drupal\lts\Person;
 
 /**
  * Implements hook_help().
@@ -21,4 +23,59 @@ function uw_groups_help($route_name, RouteMatchInterface $route_match) {
 
     default:
   }
+}
+
+function uw_groups_user_login($account){
+	// LTS person object
+	$Person = new Person;
+	
+	// Load the current user
+	$currentUser = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+	
+	// Get this users groups
+	$groups = $Person->GetGroups(Drupal::currentUser()->getAccountName());
+	
+	// Get the user's Roles
+	$delete_roles = $user_roles = Drupal::currentUser()->getRoles();
+
+	// Get all active groups
+	$active_groups = explode("\n", \Drupal::config('uw_groups.settings')->get('active_groups'));
+
+	// Get all Roles
+	$roleObjects = Role::loadMultiple();
+
+	// Sync user groups with Drupal Role Mappings
+	foreach($groups as $group){
+		// If it's not an active group, skip it
+		if(!in_array(trim($group), $active_groups)){
+			continue;
+		}
+		
+		// If the user has the role, don't delete it, and skip it.
+		if(in_array(trim($group), $user_roles)){
+			if(($key = array_search(trim($group), $delete_roles)) !== false) {
+			    unset($delete_roles[$key]);
+			}
+			continue;			
+		}
+		
+		// If the role exists, give it to the user
+		foreach($roleObjects as $roleObject){
+			// Assign the role to the user if the role exists
+			if($roleObject->id() == $group){
+				$currentUser->addRole($roleObject->id());
+			}
+		}
+		
+	}
+	
+	foreach($delete_roles as $role){
+		// If this role is an active group, then delete it
+		if(in_array($role, $active_groups)){
+			$currentUser->removeRole($role);
+		}
+	}
+	
+	// Save role changes to the user
+	$currentUser->save();
 }

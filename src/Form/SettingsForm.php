@@ -81,32 +81,32 @@ class SettingsForm extends ConfigFormBase {
     
     // Sync groups to roles
     foreach($groups as $group){
-	    if($group == ''){
+	    if(trim($group) == ''){
 		    continue;
 	    }
 	    $found = false;
 		foreach($roles as $key => $role){
-			if($group == $role){
+			if(trim($group) == $role){
 				unset($roles[$key]);
 				$found = true;
 				break;
 			}
 		}
 		foreach($old_groups as $key => $old_group){
-			if($old_group == $group){
+			if(trim($old_group) == trim($group)){
 				unset($old_groups[$key]);
 			}
 		}
 		
 		if(!$found){;
-			$role = \Drupal\user\Entity\Role::create(array('id' => $group, 'label' => $group));
+			$role = \Drupal\user\Entity\Role::create(array('id' => trim($group), 'label' => trim($group)));
 			$role->save(); 
 		}
     }
     
     foreach($old_groups as $group){
 	    foreach($roleObjects as $name => $roleObject){
-		    if($name == $group){
+		    if(trim($name) == trim($group)){
 			    $roleObject->delete();
 		    }
 	    }
