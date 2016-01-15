@@ -1,0 +1,5 @@
+uw_groups.admin:
+  title: 'UW Groups Settings'
+  description: 'Set UW Groups role mapping.'
+  route_name: uw_groups.settings
+  parent: user.admin_index

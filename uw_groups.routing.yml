@@ -1,0 +1,7 @@
+uw_groups.settings:
+  path: '/admin/config/people/uw_groups'
+  defaults:
+    _form: '\Drupal\uw_groups\Form\SettingsForm'
+    _title: 'UW Groups Settings'
+  requirements:
+    _permission: 'administer uw groups'

@@ -1,0 +1,4 @@
+administer uw groups:
+  title: 'Administer UW Groups'
+  description: 'Adjust active groups and other important things'
+  restrict access: TRUE

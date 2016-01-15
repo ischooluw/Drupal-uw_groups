@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains uw_groups.module..
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function uw_groups_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the uw_groups module.
+    case 'help.page.uw_groups':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('UW Groups') . '</p>';
+      return $output;
+
+    default:
+  }
+}
