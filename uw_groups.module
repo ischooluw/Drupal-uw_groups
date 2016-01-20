@@ -7,7 +7,7 @@
 
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\user\Entity\Role;
-use Drupal\lts\Person;
+use Drupal\uw_groups\NetIDGroups;
 
 /**
  * Implements hook_help().
@@ -26,24 +26,20 @@ function uw_groups_help($route_name, RouteMatchInterface $route_match) {
 }
 
 function uw_groups_user_login($account){
-	// LTS person object
-	$Person = new Person;
+	$NetIDGroups = new NetIDGroups;
 	
 	// Load the current user
 	$currentUser = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
 	
 	// Get this users groups
-	$groups = $Person->GetGroups(Drupal::currentUser()->getAccountName());
+	$groups = $NetIDGroups->getCurrentUserGroups();
 	
 	// Get the user's Roles
 	$delete_roles = $user_roles = Drupal::currentUser()->getRoles();
 
 	// Get all active groups
-	$active_groups = explode("\n", \Drupal::config('uw_groups.settings')->get('active_groups'));
-	foreach($active_groups as $key => $active_group){
-		$active_groups[$key] = trim($active_group);
-	}
-
+	$active_groups = $NetIDGroups->getActiveGroups();
+	
 	// Get all Roles
 	$roleObjects = Role::loadMultiple();
 	

@@ -40,6 +40,13 @@ class SettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('uw_groups.settings');
     
+	$form['details'] = array(
+		'#title' => 'Information',
+		'#type' => 'details',
+		'#open' => true,
+		'#collapsible' => false,
+		'#description' => t('The UW Groups listed below will be added as roles within Drupal. Paired with NetID login, NetID users will automatically be added/removed from groups they in which they are or are not members.'),
+	);
 	$form['active_groups'] = array(
 		'#type' => 'textarea',
 		'#title' => $this->t('Active Groups'),
