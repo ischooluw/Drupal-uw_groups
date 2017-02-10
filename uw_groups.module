@@ -27,38 +27,39 @@ function uw_groups_help($route_name, RouteMatchInterface $route_match) {
 
 function uw_groups_user_login($account){
 	$NetIDGroups = new NetIDGroups;
-	
+
 	// Load the current user
 	$currentUser = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
-	
+
 	// Get this users groups
 	$groups = $NetIDGroups->getCurrentUserGroups();
-	
+
 	// Get the user's Roles
 	$delete_roles = $user_roles = Drupal::currentUser()->getRoles();
 
 	// Get all active groups
 	$active_groups = $NetIDGroups->getActiveGroups();
-	
+
 	// Get all Roles
 	$roleObjects = Role::loadMultiple();
-	
+
 	// Sync user groups with Drupal Role Mappings
+	if(is_array($groups))
 	foreach($groups as $group){
 
 		// If it's not an active group, skip it
 		if(!in_array(trim($group), $active_groups)){
 			continue;
 		}
-		
+
 		// If the user has the role, don't delete it, and skip it.
 		if(in_array(trim($group), $user_roles)){
 			if(($key = array_search(trim($group), $delete_roles)) !== false) {
 			    unset($delete_roles[$key]);
 			}
-			continue;			
+			continue;
 		}
-		
+
 		// If the role exists, give it to the user
 		foreach($roleObjects as $roleObject){
 			// Assign the role to the user if the role exists
@@ -66,9 +67,10 @@ function uw_groups_user_login($account){
 				$currentUser->addRole($roleObject->id());
 			}
 		}
-		
+
 	}
-	
+
+  if(is_array($delete_roles))
 	foreach($delete_roles as $role){
 		//Pre($role);
 		// If this role is an active group, then delete it
@@ -77,7 +79,7 @@ function uw_groups_user_login($account){
 			$currentUser->removeRole($role);
 		}
 	}
-	
+
 	// Save role changes to the user
 	$currentUser->save();
 }
