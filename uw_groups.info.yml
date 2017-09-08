@@ -6,4 +6,3 @@ configure: uw_groups.admin
 package: UW iSchool
 dependencies:
   - user
-  - lts
