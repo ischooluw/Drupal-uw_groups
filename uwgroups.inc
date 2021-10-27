@@ -107,11 +107,11 @@ function _uwgroups_remove_managed($keepPerms = FALSE) {
 function _uwgroups_refresh_managed() {
 	// Get a list of all active groups (set in config of module).
 	$active_groups = _uwgroups_active_groups();
-	
+
 	// Fetch a list of all of our groups from LTS
 	$groups = lts_command('groups all');
 	$success = TRUE;
-	
+
 	// If there aren't any groups, something is wrong, error.
 	if (!$groups || empty($groups)) {
 		_uwgroups_error('Could not fetch all groups from LTS.');
@@ -119,10 +119,10 @@ function _uwgroups_refresh_managed() {
 	}
 
 	// -- delete the groups that we no longer need --
-	
+
 	// Get a list of current groups managed by this module
 	$current_groups = db_query("SELECT name FROM {uwgroups}")->fetchAll();
-	
+
 	// Step through list of current groups and remove ones that are no longer exist, or have been removed from active group list (config)
 	foreach($current_groups as $group){
 		if (in_array($group->name, $groups) && isset($active_groups[$group->name]))
@@ -130,7 +130,7 @@ function _uwgroups_refresh_managed() {
 
 		// delete the role & permissions
 		$row_id = current(db_query("SELECT rid FROM {role} WHERE name = :name", array(':name' => $group->name))->fetchCol());
-		
+
 		if ($row_id != '' && $row_id > 0) {
 			//db_query("DELETE FROM {users_roles} WHERE rid = :rid", array('rid' => $row_id));
 			//db_query("DELETE FROM {permission} WHERE rid = :rid", array('rid' => $row_id));
@@ -153,8 +153,8 @@ function _uwgroups_refresh_managed() {
 				//break;
 			}
 		}
-		
-		if (isset($active_groups[$group]) && db_query("SELECT COUNT(*) FROM {role} WHERE name = :name", array(':name' => $group))->fetchObject()->{'COUNT(*)'} == 0) {		
+
+		if (isset($active_groups[$group]) && db_query("SELECT COUNT(*) FROM {role} WHERE name = :name", array(':name' => $group))->fetchObject()->{'COUNT(*)'} == 0) {
 			$role = new stdClass();
 			$role->name = $group;
 			if(!user_role_save($role)) {
@@ -198,7 +198,7 @@ function _uwgroups_deny_roles($uid) {
  */
 function _uwgroups_grant_role($uid, $rolename) {
 	$rid = current(db_query("SELECT rid FROM {role} WHERE name = :name", array(':name' => $rolename))->fetchCol());
-	
+
 	// check to see if we can find the group
 	if ($rid !== false) {
 		$result = db_query('SELECT uid, rid FROM {users_roles} WHERE uid = :uid AND rid = :rid', array(':uid' => $uid, ':rid' => $rid))->fetchAll();
@@ -228,8 +228,9 @@ function _uwgroups_map_groups($user) {
 	if (!is_object($user) || trim($user->name) == '')
 		return;
 
-	$users_groups = lts_command('groups user ' . $user->name);
-
+  try{
+	  $users_groups = lts_command('groups user ' . $user->name);
+  }catch(Exception $e){}
 	// ensure we got groups
 	if (!$users_groups || empty($users_groups)) {
 	    _uwgroups_error('Could not get groups for user "%var".', $user->name);
@@ -239,7 +240,7 @@ function _uwgroups_map_groups($user) {
 	// deny all roles to the user (we add them back one by one
 	// based off of the UW GWS)
 	_uwgroups_deny_roles($user->uid);
-	
+
 	$active_groups = _uwgroups_active_groups();
 
 	foreach ($users_groups as $group){

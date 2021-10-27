@@ -32,7 +32,7 @@ function uwgroups_permission() {
  */
 function uwgroups_menu() {
   $items = array();
-  
+
   $items['admin/config/people/uwgws'] = array(
     'title' => t('UW GWS Auth'),
     'description' => t('Configure UW GWS Auth settings.'),
@@ -40,7 +40,7 @@ function uwgroups_menu() {
     'access arguments' => array(UWGWS_PERM),
     'type' => MENU_NORMAL_ITEM,
   );
-  
+
   return $items;
 }
 
