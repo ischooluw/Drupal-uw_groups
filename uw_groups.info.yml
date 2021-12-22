@@ -1,7 +1,7 @@
 name: UW Groups
 type: module
 description: Implements a UW groups -> Drupal roles mapping via the UW Groups Web Service (through LTS)
-core: 8.x
+core_version_requirement: ^8.8 || ^9
 configure: uw_groups.admin
 package: UW iSchool
 dependencies:
