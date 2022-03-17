@@ -12,9 +12,10 @@ use Drupal\uw_groups\NetIDGroups;
 /**
  * Implements hook_help().
  */
-function uw_groups_help($route_name, RouteMatchInterface $route_match) {
+function uw_groups_help($route_name, RouteMatchInterface $route_match)
+{
   switch ($route_name) {
-    // Main module help for the uw_groups module.
+      // Main module help for the uw_groups module.
     case 'help.page.uw_groups':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
@@ -25,61 +26,61 @@ function uw_groups_help($route_name, RouteMatchInterface $route_match) {
   }
 }
 
-function uw_groups_user_login($account){
-	$NetIDGroups = new NetIDGroups;
+function uw_groups_user_login($account)
+{
+  $NetIDGroups = new NetIDGroups;
 
-	// Load the current user
-	$currentUser = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+  // Load the current user
+  $currentUser = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
 
-	// Get this users groups
-	$groups = $NetIDGroups->getCurrentUserGroups();
+  // Get this users groups
+  $groups = $NetIDGroups->getCurrentUserGroups();
 
-	// Get the user's Roles
-	$delete_roles = $user_roles = Drupal::currentUser()->getRoles();
+  // Get the user's Roles
+  $delete_roles = $user_roles = Drupal::currentUser()->getRoles();
 
-	// Get all active groups
-	$active_groups = $NetIDGroups->getActiveGroups();
+  // Get all active groups
+  $active_groups = $NetIDGroups->getActiveGroups();
 
-	// Get all Roles
-	$roleObjects = Role::loadMultiple();
+  // Get all Roles
+  $roleObjects = Role::loadMultiple();
 
-	// Sync user groups with Drupal Role Mappings
-	if(is_array($groups))
-	foreach($groups as $group){
+  // Sync user groups with Drupal Role Mappings
+  if (is_array($groups))
+    foreach ($groups as $group) {
 
-		// If it's not an active group, skip it
-		if(!in_array(trim($group), $active_groups)){
-			continue;
-		}
+      // If it's not an active group, skip it
+      if (!in_array(trim($group), $active_groups)) {
+        continue;
+      }
 
-		// If the user has the role, don't delete it, and skip it.
-		if(in_array(trim($group), $user_roles)){
-			if(($key = array_search(trim($group), $delete_roles)) !== false) {
-			    unset($delete_roles[$key]);
-			}
-			continue;
-		}
+      // If the user has the role, don't delete it, and skip it.
+      if (in_array(trim($group), $user_roles)) {
+        if (($key = array_search(trim($group), $delete_roles)) !== false) {
+          unset($delete_roles[$key]);
+        }
+        continue;
+      }
 
-		// If the role exists, give it to the user
-		foreach($roleObjects as $roleObject){
-			// Assign the role to the user if the role exists
-			if($roleObject->id() == trim($group)){
-				$currentUser->addRole($roleObject->id());
-			}
-		}
+      // If the role exists, give it to the user
+      foreach ($roleObjects as $roleObject) {
+        // Assign the role to the user if the role exists
+        if ($roleObject->id() == trim($group)) {
+          $currentUser->addRole($roleObject->id());
+        }
+      }
+    }
 
-	}
+  if (is_array($delete_roles))
+    foreach ($delete_roles as $role) {
+      //Pre($role);
+      // If this role is an active group, then delete it
+      if (in_array($role, $active_groups)) {
+        echo 'remove:' . $role;
+        $currentUser->removeRole($role);
+      }
+    }
 
-  if(is_array($delete_roles))
-	foreach($delete_roles as $role){
-		//Pre($role);
-		// If this role is an active group, then delete it
-		if(in_array($role, $active_groups)){
-			echo 'remove:'.$role;
-			$currentUser->removeRole($role);
-		}
-	}
-
-	// Save role changes to the user
-	$currentUser->save();
+  // Save role changes to the user
+  $currentUser->save();
 }

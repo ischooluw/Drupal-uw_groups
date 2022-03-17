@@ -16,12 +16,14 @@ use Drupal\user\Entity\Role;
  *
  * @package Drupal\uw_groups\Form
  */
-class SettingsForm extends ConfigFormBase {
+class SettingsForm extends ConfigFormBase
+{
 
   /**
    * {@inheritdoc}
    */
-  protected function getEditableConfigNames() {
+  protected function getEditableConfigNames()
+  {
     return [
       'uw_groups.settings',
     ];
@@ -30,14 +32,16 @@ class SettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId()
+  {
     return 'uw_groups_settings_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state)
+  {
     $config = $this->config('uw_groups.settings');
 
     $form['details'] = array(
@@ -60,14 +64,16 @@ class SettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state)
+  {
     parent::validateForm($form, $form_state);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state)
+  {
     // Get the current groups
     $old_groups = explode("\n", $this->config('uw_groups.settings')->get('active_groups'));
 
@@ -82,38 +88,38 @@ class SettingsForm extends ConfigFormBase {
     // Array of current roles
     $roleObjects = Role::loadMultiple();
     $roles = array();
-    foreach($roleObjects as $key => $roleObject){
+    foreach ($roleObjects as $key => $roleObject) {
       $roles[$key] = $key;
     }
 
     // Sync groups to roles
-    foreach($groups as $group){
-      if(trim($group) == ''){
+    foreach ($groups as $group) {
+      if (trim($group) == '') {
         continue;
       }
       $found = false;
-      foreach($roles as $key => $role){
-        if(trim($group) == $role){
+      foreach ($roles as $key => $role) {
+        if (trim($group) == $role) {
           unset($roles[$key]);
           $found = true;
           break;
         }
       }
-      foreach($old_groups as $key => $old_group){
-        if(trim($old_group) == trim($group)){
+      foreach ($old_groups as $key => $old_group) {
+        if (trim($old_group) == trim($group)) {
           unset($old_groups[$key]);
         }
       }
 
-      if(!$found){;
+      if (!$found) {;
         $role = \Drupal\user\Entity\Role::create(array('id' => trim($group), 'label' => trim($group)));
         $role->save();
       }
     }
 
-    foreach($old_groups as $old_group){
-      foreach($roleObjects as $name => $roleObject){
-        if(trim($name) == trim($old_group)){
+    foreach ($old_groups as $old_group) {
+      foreach ($roleObjects as $name => $roleObject) {
+        if (trim($name) == trim($old_group)) {
           $roleObject->delete();
         }
       }
